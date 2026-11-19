@@ -1,0 +1,1 @@
+<a class="gv-brand" href="{{ route('inicio') }}"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="23" fill="white"/><path d="M24 8C19 16 12 22 12 29a12 12 0 0 0 24 0c0-7-7-13-12-21Z" fill="#2E7D6B"/><path d="M17 31c0-9 6-13 15-14-1 9-5 15-15 14Zm0 0 11-9" fill="#b5dca2" stroke="#fff" stroke-width="1.5"/></svg>GotaVerde</a>

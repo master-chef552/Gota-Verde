@@ -22,7 +22,7 @@ class SesionController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        if (! Auth::attempt($credenciales)) {
+        if (! Auth::attempt($credenciales, $request->boolean('remember'))) {
             return back()->withErrors([
                 'email' => 'El correo o la contraseña no son correctos.',
             ])->onlyInput('email');

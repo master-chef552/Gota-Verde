@@ -3,11 +3,11 @@
 @section('titulo', 'Registrar vivienda')
 
 @section('contenido')
-<div class="mx-auto max-w-2xl">
+<div class="max-w-3xl">
     <a href="{{ route('dashboard') }}" class="mb-5 inline-flex text-sm font-semibold text-[#2E7D6B] hover:underline">← Volver al dashboard</a>
-    <section class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-[#dfe8e1] md:p-10">
+    <section class="gv-card">
         <p class="mb-2 text-xs font-bold uppercase tracking-widest text-[#2E7D6B]">Configuración inicial</p>
-        <h1 class="mb-2 text-3xl font-extrabold text-[#1F5F5B]">Registrar vivienda</h1>
+        <h1 class="mb-2 text-2xl font-bold text-[#182d2b]">Registrar vivienda</h1>
         <p class="mb-8 text-sm leading-6 text-slate-600">Estos datos identifican tu vivienda. Solo las personas autorizadas podrán consultar sus registros.</p>
         <form method="POST" action="{{ route('viviendas.store') }}" class="grid gap-5 sm:grid-cols-2">
             @csrf
@@ -43,7 +43,7 @@
                 <p class="mt-2 text-xs leading-5 text-slate-500">Si desconoces la tarifa, deja el campo vacío. Por ahora no se calculará ahorro económico; los resultados monetarios serán orientativos.</p>
             </div>
             <div class="sm:col-span-2">
-                <button type="submit" class="w-full rounded-xl bg-[#2E7D6B] px-5 py-3 font-bold text-white hover:bg-[#1F5F5B]">Guardar vivienda</button>
+                <button type="submit" class="gv-btn w-full">Guardar vivienda</button>
             </div>
         </form>
     </section>

@@ -10,6 +10,15 @@ use Illuminate\View\View;
 
 class ViviendaController extends Controller
 {
+    public function index(Request $request, \App\Services\ViviendasDelUsuario $servicio): View
+    {
+        $viviendas = $servicio->todas($request);
+        $vivienda = $servicio->activa($request, $viviendas);
+        $miembros = $vivienda ? $vivienda->usuarios()->get() : collect();
+        $roles = \Illuminate\Support\Facades\DB::table('vivienda_usuario')->where('user_id', $request->user()->id)->pluck('rol', 'vivienda_id');
+        return view('viviendas.index', compact('viviendas', 'vivienda', 'miembros', 'roles'));
+    }
+
     public function create(): View
     {
         return view('viviendas.crear');
@@ -47,6 +56,6 @@ class ViviendaController extends Controller
 
         $request->session()->put('vivienda_activa_id', $vivienda->id);
 
-        return redirect()->route('dashboard');
+        return redirect()->route($request->input('destino') === 'viviendas' ? 'viviendas.index' : 'dashboard');
     }
 }

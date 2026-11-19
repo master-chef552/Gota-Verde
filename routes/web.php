@@ -7,7 +7,7 @@ use App\Http\Controllers\RegistroHabitoController;
 use App\Http\Controllers\ViviendaController;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'inicio')->name('inicio');
+Route::get('/', fn () => redirect()->route(auth()->check() ? 'dashboard' : 'login'))->name('inicio');
 
 Route::middleware('guest')->group(function (): void {
     Route::get('/registro', [RegistroController::class, 'create'])->name('register');
@@ -19,6 +19,10 @@ Route::middleware('guest')->group(function (): void {
 Route::middleware('auth')->group(function (): void {
     Route::post('/salir', [SesionController::class, 'destroy'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/viviendas', [ViviendaController::class, 'index'])->name('viviendas.index');
+    Route::view('/lecturas', 'pendientes.lecturas')->name('lecturas');
+    Route::view('/metas', 'pendientes.metas')->name('metas');
+    Route::view('/logros', 'pendientes.logros')->name('logros');
     Route::get('/viviendas/crear', [ViviendaController::class, 'create'])->name('viviendas.create');
     Route::post('/viviendas', [ViviendaController::class, 'store'])->name('viviendas.store');
     Route::post('/viviendas/{vivienda}/seleccionar', [ViviendaController::class, 'seleccionar'])->name('viviendas.seleccionar');

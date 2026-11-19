@@ -1,53 +1,34 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Models\RegistroHabito;
 use App\Services\ViviendasDelUsuario;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-
 class DashboardController extends Controller
 {
-    public function index(Request $request, ViviendasDelUsuario $viviendasDelUsuario): View
+    public function index(Request $request, ViviendasDelUsuario $servicio): View
     {
-        $viviendas = $viviendasDelUsuario->todas($request);
-        $vivienda = $viviendasDelUsuario->activa($request, $viviendas);
-
-        $registros = collect();
-        $litrosSemana = 0;
-        $ahorradosSemana = 0;
-        $actividadesSemana = 0;
-
+        $viviendas = $servicio->todas($request);
+        $vivienda = $servicio->activa($request, $viviendas);
+        $modo = $request->query('modo') === 'global' ? 'global' : 'individual';
+        $inicio = now()->startOfWeek(); $fin = $inicio->copy()->addDays(6);
+        $dias = collect(range(0,6))->map(fn($i) => $inicio->copy()->addDays($i));
+        $registros = collect(); $series = collect(); $litrosSemana = $ahorradosSemana = $pesosSemana = $ahorroAcumulado = 0;
         if ($vivienda) {
-            $consulta = RegistroHabito::query()
-                ->where('vivienda_id', $vivienda->id)
-                ->whereBetween('fecha', [now()->startOfWeek()->toDateString(), now()->endOfWeek()->toDateString()]);
-
-            $resumen = (clone $consulta)->selectRaw(
-                'COUNT(*) AS total, COALESCE(SUM(litros_consumidos), 0) AS litros, COALESCE(SUM(litros_ahorrados), 0) AS ahorro'
-            )->first();
-
-            $litrosSemana = (float) $resumen->litros;
-            $ahorradosSemana = (float) $resumen->ahorro;
-            $actividadesSemana = (int) $resumen->total;
-
-            $registros = RegistroHabito::query()
-                ->with('actividad')
-                ->where('vivienda_id', $vivienda->id)
-                ->orderByDesc('fecha')
-                ->orderByDesc('id')
-                ->limit(12)
-                ->get();
+            $base = RegistroHabito::query()->where('vivienda_id', $vivienda->id);
+            if ($modo === 'individual') $base->where('user_id', $request->user()->id);
+            $semana = (clone $base)->whereBetween('fecha',[$inicio->toDateString(), $fin->toDateString()]);
+            $litrosSemana = (float)(clone $semana)->sum('litros_consumidos');
+            $ahorradosSemana = (float)(clone $semana)->sum('litros_ahorrados');
+            $ahorroAcumulado = (float)(clone $base)->sum('litros_ahorrados');
+            $pesosSemana = round($ahorradosSemana / 1000 * (float)$vivienda->tarifa_m3,2);
+            $series = (clone $semana)->with('actividad')->selectRaw('fecha, actividad_id, SUM(litros_consumidos) AS total')->groupBy('fecha','actividad_id')->get();
+            $registros = (clone $base)->with('actividad')->orderByDesc('fecha')->orderByDesc('id')->limit(12)->get();
         }
-
-        $pesosSemana = $vivienda
-            ? round($ahorradosSemana / 1000 * (float) $vivienda->tarifa_m3, 2)
-            : 0;
-
-        return view('dashboard.index', compact(
-            'viviendas', 'vivienda', 'registros', 'litrosSemana',
-            'ahorradosSemana', 'actividadesSemana', 'pesosSemana'
-        ));
+        $colores = ['#2E7D6B','#2B8BC6','#5FA35A','#C9A227','#E08A5A'];
+        $catalogo = $series->pluck('actividad.nombre','actividad_id');
+        $paleta = []; foreach($catalogo->keys()->values() as $i => $id) $paleta[$id] = $colores[$i % count($colores)];
+        $maximo = max(1, (float)$series->groupBy(fn($r) => $r->fecha->toDateString())->map(fn($g) => $g->sum('total'))->max());
+        return view('dashboard.index',compact('viviendas','vivienda','modo','inicio','fin','dias','registros','series','litrosSemana','ahorradosSemana','pesosSemana','ahorroAcumulado','catalogo','paleta','maximo'));
     }
 }

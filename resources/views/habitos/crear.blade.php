@@ -3,11 +3,11 @@
 @section('titulo', 'Registrar hábito')
 
 @section('contenido')
-<div class="mx-auto max-w-2xl">
+<div class="max-w-3xl">
     <a href="{{ route('dashboard') }}" class="mb-5 inline-flex text-sm font-semibold text-[#2E7D6B] hover:underline">← Volver al dashboard</a>
-    <section class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-[#dfe8e1] md:p-10">
+    <section class="gv-card">
         <p class="mb-2 text-xs font-bold uppercase tracking-widest text-[#2E7D6B]">Vivienda: {{ $vivienda->alias }}</p>
-        <h1 class="mb-2 text-3xl font-extrabold text-[#1F5F5B]">Registrar un hábito</h1>
+        <h1 class="mb-2 text-2xl font-bold text-[#182d2b]">Registrar un hábito</h1>
         <p class="mb-8 text-sm text-slate-600">Para comenzar, registra una ducha e indica su duración en minutos.</p>
         @if ($actividades->isEmpty())
             <div class="rounded-xl bg-amber-50 p-5 text-sm leading-7 text-amber-900">
@@ -42,7 +42,7 @@
                 <div class="rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-slate-700">
                     <strong>¿Cómo calculamos los litros?</strong> Para una ducha se utiliza una referencia aproximada de 10 L/min. Por ejemplo, 10 minutos equivalen a 100 litros estimados. El consumo efectivo depende de la regadera y la presión del agua.
                 </div>
-                <button type="submit" class="w-full rounded-xl bg-[#2E7D6B] px-5 py-3 font-bold text-white hover:bg-[#1F5F5B]">Guardar hábito</button>
+                <button type="submit" class="gv-btn w-full">Guardar hábito</button>
             </form>
             <script>
                 (() => {
